@@ -2,6 +2,8 @@
 
 Object-oriented Python project for managing customers, services and reservations.
 
+Software FJ reservation system developed in Python using OOP principles.
+
 ## Features
 
 * Customer registration with validations
