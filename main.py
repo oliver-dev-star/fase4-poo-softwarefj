@@ -1,5 +1,5 @@
 from reservation import Reservation
-from service import RoomService, SpaService, EquipmentRentalService, ConsultingService
+from service import RoomService, SpaService, RentedService, ConsultationService
 from Customer import Customer
 
 #Save errors to file
@@ -44,16 +44,16 @@ except Exception as e:
     save_error_to_file(e)  
 
 try:
-    equipment1 = EquipmentRentalService(2, "Projector Rental", 80)
-    print("Equipment service created successfully\n")
+    equipment1 = RentedService(2, "Projector Rental", 80)
+    print("Rented service created successfully\n")
 except Exception as e:
-    print("Error creating equipment service:\n", e)
+    print("Error creating Rented service:\n", e)
     save_error_to_file(e)
 try:
-    consulting1 = ConsultingService(3, "Software Consulting", 150)
-    print("Consulting service created successfully\n")
+    consulting1 = ConsultationService(3, "Software Consulting", 150)
+    print("Consultation service created successfully\n")
 except Exception as e:
-    print("Error creating consulting service:\n", e)
+    print("Error creating consultation service:\n", e)
     save_error_to_file(e)
 
 # Reservation
@@ -126,16 +126,16 @@ print("")
 print("----Services -----\n")
 print(room1)
 print(spa1)
-print(equipment1)
-print(consulting1)
+print(rented1)
+print(consultation1)
 
 print("")
 print("----Service Costs -----\n")
 
 print("Room Cost:", room1.calculate_cost(5))
 print("Spa Cost:", spa1.calculate_cost(3))
-print("Equipment Rental Cost:", equipment1.calculate_cost(2))
-print("Consulting Cost:", consulting1.calculate_cost(4))
+print("Rented Cost:", Rented1.calculate_cost(2))
+print("Consultation:", consultation1.calculate_cost(4))
 print("")
 print("----Reservations -----\n")
 print(reservation1)
