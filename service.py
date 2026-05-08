@@ -49,14 +49,14 @@ class SpaService(Service):
     def calculate_cost(self, hours):
         return self._service_price * hours
 
-class EquipmentRentalService(Service):
+class RentedService(Service):
      def __init__(self, service_id, service_name, service_price):
         super().__init__(service_id, service_name, service_price)
 
     def calculate_cost(self, days):
         return self._service_price * days
 
-class ConsultingService(Service)
+class ConsultationService(Service)
     def __init__(self, service_id, service_name, service_price):
         super().__init__(service_id, service_name, service_price)
 
