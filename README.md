@@ -46,6 +46,7 @@ It fulfills academic requirements for:
   - `SpaService`
   - `RentedService`
   - `ConsultationService`  
+  
   Each implements polymorphism by defining how to calculate costs based on days, hours, or quantity.
 
 - **Reservation**  
