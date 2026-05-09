@@ -1,3 +1,4 @@
+import os
 import logging
 from models.Reservation import Reservation
 from models.Service import (
@@ -9,10 +10,15 @@ from models.Service import (
 )
 from models.Customer import Customer
 
-# Save errors to file
+log_dir = "logs"
+if not os.path.exists(log_dir):
+    os.makedirs(log_dir)
+    print(f"Directory '{log_dir}' created successfully.")
 
+
+# Save errors to file
 logging.basicConfig(
-    filename="logs/software_fj.log",
+    filename=os.path.join(log_dir, "software_fj.log"),
     level=logging.ERROR,
     format="%(asctime)s - %(levelname)s - %(message)s",
 )
