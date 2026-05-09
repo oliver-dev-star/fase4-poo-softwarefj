@@ -7,52 +7,63 @@ from exceptions import *
 class Reservation:
     """
     Manages the booking of a service by a customer.
+    Handles date parsing, validation, and cost calculation.
 
     Attributes:
-        _reservation_id (int): Unique identifier.
-        _check_in_date (str): Start date (YYYY-MM-DD).
-        _check_out_date (str): End date (YYYY-MM-DD).
-        _customer (Customer): The customer making the reservation.
-        _service (Service): The requested service.
-        _quantity (int): Duration or amount for the service.
-        _status (str): Current status ('pending', 'confirmed', 'cancelled').
+        _reservation_id (int): Unique identifier for the reservation.
+        _check_in_date (str): Start date/time of the reservation.
+        _check_out_date (str): End date/time of the reservation.
+        _customer (Customer): The customer holding the reservation.
+        _service (Service): The service being reserved.
+        _quantity (int): The duration (days or hours) of the reservation.
+        _status (str): Current reservation status ('pending', 'confirmed', 'cancelled').
     """
 
     def __init__(
         self, reservation_id, check_in_date, check_out_date, customer, service, quantity
     ):
         """
-        Initializes a Reservation and validates all input parameters.
+        Initializes a Reservation instance and applies business logic validations.
 
         Args:
-            reservation_id (int): ID of the reservation.
-            check_in_date (str): Start date string.
-            check_out_date (str): End date string.
-            customer (Customer): Instance of Customer.
-            service (Service): Instance of Service.
-            quantity (int): Units of service requested.
+            reservation_id (int): Unique ID of the reservation.
+            check_in_date (str): Start date string (Format: YYYY-MM-DD or YYYY-MM-DD HH:MM).
+            check_out_date (str): End date string (Format: YYYY-MM-DD or YYYY-MM-DD HH:MM).
+            customer (Customer): The related Customer object.
+            service (Service): The related Service object.
+            quantity (int): Duration in days or hours.
 
         Raises:
             ReservationServiceError: If service is None or not a Service instance.
-            ReservationDateError: If date format is wrong or check-in is after check-out.
-            ReservationQuantityError: If quantity is <= 0.
-            ReservationIDError: If reservation_id is <= 0.
-            ReservationCustomerError: If customer is not a Customer instance.
+            ReservationDateError: If date parsing fails or check-in is after check-out.
+            ReservationQuantityError: If quantity is 0 or negative.
+            ReservationIDError: If the reservation ID is invalid.
+            ReservationCustomerError: If customer is invalid.
         """
         if service is None:
             raise ReservationServiceError("Service cannot be None")
 
+        def parse_date(d_str):
+            """
+            Internal helper function to parse dates.
+            Supports exact datetime formatting or legacy daily formatting to ensure
+            backward compatibility with existing automated simulations.
+            """
+            for fmt in ("%Y-%m-%d %H:%M", "%Y-%m-%d"):
+                try:
+                    return datetime.strptime(d_str, fmt)
+                except ValueError:
+                    pass
+            raise ValueError(f"Time data '{d_str}' does not match expected formats.")
+
         try:
-            date_format = "%Y-%m-%d"
-            start = datetime.strptime(check_in_date, date_format)
-            end = datetime.strptime(check_out_date, date_format)
+            start = parse_date(check_in_date)
+            end = parse_date(check_out_date)
 
             if start > end:
-                raise ReservationDateError(
-                    "Check-in date must be before check-out date"
-                )
-        # Exception Chaining example
+                raise ReservationDateError("Check-in/Start time must be before check-out/End time")
         except ValueError as e:
+            # Demonstrating Exception Chaining
             raise ReservationDateError(f"Invalid date format: {e}") from e
 
         if quantity <= 0:
@@ -62,14 +73,10 @@ class Reservation:
             raise ReservationIDError("Reservation ID must be greater than 0")
 
         if not isinstance(customer, Customer):
-            raise ReservationCustomerError(
-                "Customer must be an instance of Customer class"
-            )
+            raise ReservationCustomerError("Customer must be an instance of Customer class")
 
         if not isinstance(service, Service):
-            raise ReservationServiceError(
-                "Service must be an instance of Service class"
-            )
+            raise ReservationServiceError("Service must be an instance of Service class")
 
         self._reservation_id = reservation_id
         self._check_in_date = check_in_date
@@ -80,46 +87,63 @@ class Reservation:
         self._status = "pending"
 
     def confirm_reservation(self):
-        """Confirms the reservation if it is not already cancelled."""
+        """
+        Changes the status of the reservation to 'confirmed'.
+
+        Raises:
+            ReservationStatusError: If the reservation has already been cancelled.
+        """
         if self._status == "cancelled":
             raise ReservationStatusError("Reservation is cancelled and cannot be confirmed")
         self._status = "confirmed"
 
     def cancel_reservation(self):
-        """Cancels the reservation."""
+        """
+        Changes the status of the reservation to 'cancelled'.
+
+        Raises:
+            ReservationStatusError: If the reservation is already cancelled.
+        """
         if self._status == "cancelled":
             raise ReservationStatusError("Reservation is already cancelled")
         self._status = "cancelled"
 
     def get_reservation_id(self):
+        """Returns the reservation ID."""
         return self._reservation_id
 
     def get_check_in_date(self):
+        """Returns the check-in date/time."""
         return self._check_in_date
 
     def get_check_out_date(self):
+        """Returns the check-out date/time."""
         return self._check_out_date
 
     def get_customer(self):
+        """Returns the associated Customer object."""
         return self._customer
 
     def get_service(self):
+        """Returns the associated Service object."""
         return self._service
 
     def get_quantity(self):
+        """Returns the requested duration or quantity."""
         return self._quantity
 
     def calculate_total_cost(self, discount=0, tax_rate=0.0):
         """
-        Calculates the total cost with optional discount and taxes.
-        Demonstrates method overloading concept through default parameters.
+        Calculates the final cost for the reservation by interacting with the
+        associated service's cost calculation strategy. 
+        Demonstrates method overloading via default arguments.
 
         Args:
-            discount (float, optional): Fixed discount amount. Defaults to 0.
-            tax_rate (float, optional): Tax rate as a decimal (e.g., 0.19 for 19%). Defaults to 0.0.
+            discount (float, optional): Fixed discount amount to subtract. Defaults to 0.
+            tax_rate (float, optional): Decimal representing tax percentage. Defaults to 0.0.
 
         Returns:
-            float: Final calculated cost.
+            float: The total calculated cost.
         """
         base_cost = self._service.calculate_cost(self._quantity)
         total = base_cost - discount
@@ -127,17 +151,23 @@ class Reservation:
         return total
 
     def show_info(self):
-        """Displays formatted reservation details."""
+        """
+        Formats and returns the full details of the reservation.
+
+        Returns:
+            str: A multi-line string containing reservation details.
+        """
         total = self.calculate_total_cost()
         return (
             f"RESERVATION DETAILS\n"
             f"ID: {self._reservation_id}\n"
             f"Status: {self._status.upper()}\n"
-            f"Dates: {self._check_in_date} to {self._check_out_date}\n"
+            f"Dates/Time: {self._check_in_date} to {self._check_out_date}\n"
             f"Client: {self._customer.get_name()} \n"
             f"Service: {self._service.get_service_name()}\n"
             f"Total Cost: ${total}"
         )
 
     def __str__(self):
+        """String representation of the reservation (delegates to show_info)."""
         return self.show_info()
