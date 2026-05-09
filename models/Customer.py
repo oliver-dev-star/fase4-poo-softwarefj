@@ -1,6 +1,6 @@
 from models.BaseEntity import BaseEntity
 import exceptions
-from exceptions import *
+from exceptions import *  # noqa: F403
 
 
 class Customer(BaseEntity):

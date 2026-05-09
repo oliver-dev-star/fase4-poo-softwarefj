@@ -55,3 +55,19 @@ class SpaService(Service):
 
     def show_info(self):
         return f"SERVICE SPA: {self._entity_name} | ID: {self._entity_id} | Hourly Rate: ${self._service_price}"
+
+
+class RentedService(Service):
+    def __init__(self, service_id, service_name, service_price):
+        super().__init__(service_id, service_name, service_price)
+
+    def calculate_cost(self, days):
+        return self._service_price * days
+
+
+class ConsultationService(Service):
+    def __init__(self, service_id, service_name, service_price):
+        super().__init__(service_id, service_name, service_price)
+
+    def calculate_cost(self, hours):
+        return self._service_price * hours

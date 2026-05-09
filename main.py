@@ -1,7 +1,13 @@
 import logging
 from datetime import datetime
 from models.Reservation import Reservation
-from models.Service import RoomService, SpaService, CleaningService
+from models.Service import (
+    RoomService,
+    SpaService,
+    CleaningService,
+    RentedService,
+    ConsultationService,
+)
 from models.Customer import Customer
 
 # Save errors to file
@@ -16,8 +22,6 @@ logging.basicConfig(
     level=logging.ERROR,
     format="%(asctime)s - %(levelname)s - %(message)s",
 )
-
-# Creation of customers
 
 
 def run_test():
